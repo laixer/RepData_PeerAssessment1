@@ -45,12 +45,28 @@ ggplot(steps_by_interval, aes(interval, mean_steps)) +
   geom_point() + 
   geom_line() + 
   scale_x_datetime(labels = date_format("%H:%M"))
-format(steps_by_interval$interval[which.max(steps_by_interval$mean_steps)], format = "%H:%M")
+format(steps_by_interval$interval[which.max(steps_by_interval$mean_steps)], 
+       format = "%H:%M")
 ```
 
 
 ## Imputing missing values
 
+```{r}
+sum(is.na(activity_data$steps))
 
+activity_data_imputed <- activity_data %>% 
+  mutate(steps = ifelse(is.na(steps), 
+                        steps_by_interval$mean_steps[steps_by_interval$interval == interval], 
+                        steps))
+steps_by_date_imputed <- 
+  activity_data_imputed %>% 
+  filter(!is.na(steps)) %>% 
+  group_by(date) %>% 
+  summarize(total_steps = sum(steps))
+ggplot(steps_by_date_imputed, aes(total_steps)) + geom_histogram(binwidth = 1000)
+mean(steps_by_date_imputed$total_steps)
+median(steps_by_date_imputed$total_steps)
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
