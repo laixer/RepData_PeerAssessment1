@@ -122,10 +122,14 @@ data is to use the average for the given interval.
 
 
 ```r
+mean_steps_for_interval <- function(interval) {
+  # TODO(laixer): Find less ugly way to do this.
+  return(steps_by_interval$mean_steps[steps_by_interval$interval == interval])
+}
+
 activity_data_imputed <- activity_data %>% 
   mutate(steps = ifelse(is.na(steps), 
-                        # TODO(laixer): Find less ugly way to do this.
-                        sapply(interval, function(x) steps_by_interval$mean_steps[steps_by_interval$interval == x]), 
+                        sapply(interval, mean_steps_for_interval), 
                         steps))
 
 steps_by_date_imputed <- 
@@ -173,7 +177,9 @@ equal to the average number of steps.
 ```r
 activity_data_imputed <- activity_data_imputed %>% 
   mutate(day_of_week=weekdays(ymd(date)), 
-         type_of_day=as.factor(ifelse(day_of_week %in% c("Saturday", "Sunday"), "weekend", "weekday")))
+         type_of_day=as.factor(ifelse(day_of_week %in% c("Saturday", "Sunday"), 
+                                      "weekend", 
+                                      "weekday")))
 
 steps_by_interval_and_type_of_day <- 
   activity_data_imputed %>% 

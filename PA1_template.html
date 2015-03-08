@@ -122,10 +122,14 @@ ggplot(steps_by_interval, aes(interval, mean_steps)) +
 <pre class="r"><code>sum(is.na(activity_data$steps))</code></pre>
 <pre><code>## [1] 2304</code></pre>
 <p>When data is missing, it’s missing for entire days. A simple way to impute the data is to use the average for the given interval.</p>
-<pre class="r"><code>activity_data_imputed &lt;- activity_data %&gt;% 
+<pre class="r"><code>mean_steps_for_interval &lt;- function(interval) {
+  # TODO(laixer): Find less ugly way to do this.
+  return(steps_by_interval$mean_steps[steps_by_interval$interval == interval])
+}
+
+activity_data_imputed &lt;- activity_data %&gt;% 
   mutate(steps = ifelse(is.na(steps), 
-                        # TODO(laixer): Find less ugly way to do this.
-                        sapply(interval, function(x) steps_by_interval$mean_steps[steps_by_interval$interval == x]), 
+                        sapply(interval, mean_steps_for_interval), 
                         steps))
 
 steps_by_date_imputed &lt;- 
@@ -150,7 +154,9 @@ ggplot(steps_by_date_imputed, aes(total_steps)) +
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
 <pre class="r"><code>activity_data_imputed &lt;- activity_data_imputed %&gt;% 
   mutate(day_of_week=weekdays(ymd(date)), 
-         type_of_day=as.factor(ifelse(day_of_week %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;), &quot;weekend&quot;, &quot;weekday&quot;)))
+         type_of_day=as.factor(ifelse(day_of_week %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;), 
+                                      &quot;weekend&quot;, 
+                                      &quot;weekday&quot;)))
 
 steps_by_interval_and_type_of_day &lt;- 
   activity_data_imputed %&gt;% 
