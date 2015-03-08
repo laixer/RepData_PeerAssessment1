@@ -124,7 +124,6 @@ activity_data_imputed <- activity_data_imputed %>%
 
 steps_by_interval_and_type_of_day <- 
   activity_data_imputed %>% 
-  filter(!is.na(steps)) %>% 
   group_by(interval, type_of_day) %>% 
   summarize(mean_steps = mean(steps))
 
